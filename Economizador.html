@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>ORÇAMENTO · ASIIMOV</title>
+<meta name="theme-color" content="#16140f">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Orçamento">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='12' fill='%2316140f'/%3E%3Crect x='6' y='6' width='88' height='88' rx='8' fill='none' stroke='%23f2541b' stroke-width='3'/%3E%3Ctext x='50' y='66' font-size='44' text-anchor='middle' fill='%23f2541b' font-family='monospace' font-weight='700'%3ER$%3C/text%3E%3C/svg%3E">
+<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='12' fill='%2316140f'/%3E%3Crect x='6' y='6' width='88' height='88' rx='8' fill='none' stroke='%23f2541b' stroke-width='3'/%3E%3Ctext x='50' y='66' font-size='44' text-anchor='middle' fill='%23f2541b' font-family='monospace' font-weight='700'%3ER$%3C/text%3E%3C/svg%3E">
+<link href="https://fonts.googleapis.com/css2?family=Saira+Condensed:wght@500;600;700&family=Saira:wght@400;500;600&family=Saira+Stencil+One&family=JetBrains+Mono:wght@400;500;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bone:#e7e4db;        /* off-white asiimov */
+    --bone-2:#f0eee7;      /* card */
+    --ink:#16140f;         /* near black */
+    --ink-2:#211e18;
+    --orange:#f2541b;      /* signature */
+    --orange-bright:#ff7a33;
+    --green:#2fae6a;
+    --red:#e23b2c;
+    --muted:#6b675c;
+    --line:#16140f;
+    --line-soft:#cbc7ba;
+    --hazard:repeating-linear-gradient(-45deg,var(--orange) 0 11px,#16140f 11px 22px);
+  }
+  *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+  html,body{background:var(--bone)}
+  body{
+    font-family:'Saira',system-ui,sans-serif;color:var(--ink);
+    -webkit-font-smoothing:antialiased;
+    background:
+      linear-gradient(0deg,rgba(22,20,15,.03) 1px,transparent 1px) 0 0/100% 28px,
+      var(--bone);
+    padding:max(18px,env(safe-area-inset-top)) 15px calc(40px + env(safe-area-inset-bottom));
+  }
+  .mono{font-family:'JetBrains Mono',monospace;font-variant-numeric:tabular-nums}
+  .wrap{max-width:440px;margin:0 auto}
+
+  /* header */
+  .head{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+  .brand{font-family:'Saira Stencil One',sans-serif;font-size:22px;letter-spacing:.04em;line-height:1;color:var(--ink)}
+  .brand b{color:var(--orange)}
+  .head .sub{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted);
+    font-weight:600;letter-spacing:.08em;text-transform:uppercase;margin-top:4px}
+  .gear{background:var(--ink);border:none;color:var(--bone);cursor:pointer;font-size:17px;line-height:1;
+    width:38px;height:38px;border-radius:8px;display:flex;align-items:center;justify-content:center}
+  .gear:active{transform:scale(.95)}
+
+  /* cycle hazard progress */
+  .track{height:10px;background:#d7d3c7;border:1.5px solid var(--ink);border-radius:3px;overflow:hidden;margin-bottom:14px;position:relative}
+  .track > i{display:block;height:100%;background:var(--hazard);transition:width .4s ease}
+
+  /* hero — scope readout */
+  .hero{
+    background:var(--ink);color:var(--bone);border-radius:12px;padding:26px 22px 22px;margin-bottom:13px;position:relative;
+    overflow:hidden;border:1.5px solid var(--ink);
+    box-shadow:0 14px 34px -18px rgba(22,20,15,.65);
+  }
+  .hero::before,.hero::after{content:'';position:absolute;width:22px;height:22px;pointer-events:none}
+  .hero::before{top:10px;left:10px;border-top:2px solid var(--orange);border-left:2px solid var(--orange)}
+  .hero::after{bottom:10px;right:10px;border-bottom:2px solid var(--orange);border-right:2px solid var(--orange)}
+  .scan{position:absolute;inset:0;background:linear-gradient(180deg,transparent,rgba(255,122,51,.07),transparent);
+    height:40%;animation:scan 4.5s linear infinite;pointer-events:none}
+  @keyframes scan{0%{transform:translateY(-120%)}100%{transform:translateY(320%)}}
+  .hero .label{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.18em;text-transform:uppercase;
+    color:var(--orange);font-weight:700;display:flex;align-items:center;gap:7px}
+  .hero .label::before{content:'';width:7px;height:7px;border-radius:50%;background:var(--orange);box-shadow:0 0 8px var(--orange-bright)}
+  .hero .big{font-family:'JetBrains Mono',monospace;font-variant-numeric:tabular-nums;color:#fff;
+    font-size:48px;font-weight:800;line-height:1.02;margin:10px 0 2px;letter-spacing:-0.03em}
+  .hero .big .cur{font-size:23px;color:var(--orange);font-weight:700;margin-right:5px}
+  .hero .big .tag{font-size:16px;color:var(--red);font-weight:600;margin-left:6px;font-family:'Saira Condensed',sans-serif;text-transform:uppercase;letter-spacing:.04em}
+  .hero .breakdown{font-size:13.5px;color:#cbc7bb;margin-top:11px;line-height:1.55}
+  .hero .breakdown b{font-weight:600;color:#fff}
+  .hero.neg{background:#2a140e}
+  .hero.neg::before,.hero.neg::after{border-color:var(--red)}
+  .pill{display:inline-flex;align-items:center;gap:6px;font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;
+    padding:5px 12px;border-radius:4px;margin-top:14px;letter-spacing:.06em;text-transform:uppercase;border:1px solid}
+  .pill.up{background:rgba(47,174,106,.14);color:#6fe0a2;border-color:rgba(47,174,106,.4)}
+  .pill.down{background:rgba(226,59,44,.16);color:#ff8b7e;border-color:rgba(226,59,44,.45)}
+
+  /* log */
+  .log{background:var(--bone-2);border:1.5px solid var(--ink);border-radius:12px;padding:18px;margin-bottom:13px}
+  .log .q{font-family:'Saira Condensed',sans-serif;font-size:17px;font-weight:700;text-transform:uppercase;letter-spacing:.02em;margin-bottom:13px}
+  .inrow{display:flex;gap:9px}
+  .infield{flex:1;position:relative;display:flex;align-items:center}
+  .infield .pre{position:absolute;left:14px;font-size:16px;color:var(--orange);font-weight:700;pointer-events:none;font-family:'JetBrains Mono',monospace}
+  .infield input{width:100%;font-family:'JetBrains Mono',monospace;font-size:19px;font-weight:700;
+    padding:13px 12px 13px 40px;border:1.5px solid var(--ink);border-radius:9px;background:#fff;color:var(--ink)}
+  .infield input:focus{outline:none;border-color:var(--orange);box-shadow:0 0 0 3px rgba(242,84,27,.16)}
+  .btn{border:none;border-radius:9px;font-family:'Saira Condensed',sans-serif;font-size:15px;font-weight:700;
+    text-transform:uppercase;letter-spacing:.04em;cursor:pointer;transition:transform .05s,filter .15s}
+  .btn:active{transform:scale(.97)}
+  .btn-go{background:var(--orange);color:#fff;padding:0 20px}
+  .btn-go:active{filter:brightness(1.08)}
+  .btn-zero{width:100%;margin-top:10px;background:var(--ink);color:var(--bone);padding:12px;
+    font-size:13px;letter-spacing:.05em}
+
+  /* stats */
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:18px}
+  .stat{background:var(--bone-2);border:1.5px solid var(--ink);border-radius:11px;padding:14px 15px;position:relative}
+  .stat::after{content:'';position:absolute;top:8px;right:8px;width:6px;height:6px;background:var(--orange);border-radius:50%}
+  .stat .k{font-family:'JetBrains Mono',monospace;font-size:10.5px;color:var(--muted);font-weight:700;letter-spacing:.06em;text-transform:uppercase}
+  .stat .v{font-family:'JetBrains Mono',monospace;font-variant-numeric:tabular-nums;font-size:22px;font-weight:800;margin-top:5px;letter-spacing:-0.02em}
+  .stat .v.green{color:var(--green)} .stat .v.coral{color:var(--red)}
+  .stat .sub{font-size:11px;color:var(--muted);margin-top:2px}
+
+  /* history */
+  .hist-h{display:flex;align-items:center;justify-content:space-between;margin:2px 2px 9px}
+  .hist-h span{font-family:'Saira Condensed',sans-serif;font-size:14px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.1em}
+  .hist-h button{background:none;border:none;color:var(--red);font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;cursor:pointer;text-transform:uppercase;letter-spacing:.05em}
+  .hist{background:var(--bone-2);border:1.5px solid var(--ink);border-radius:12px;overflow:hidden}
+  .row{display:grid;grid-template-columns:auto 1fr auto;gap:10px;align-items:center;padding:12px 16px;border-bottom:1px solid var(--line-soft)}
+  .row:last-child{border-bottom:none}
+  .row .d{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted);font-weight:700;min-width:48px;letter-spacing:.03em}
+  .row .amt{font-family:'JetBrains Mono',monospace;font-size:14px;font-weight:700;text-align:right}
+  .row .roll{font-family:'JetBrains Mono',monospace;font-size:12.5px;font-weight:700;text-align:right;min-width:84px}
+  .row .roll.green{color:var(--green)} .row .roll.coral{color:var(--red)}
+  .empty{padding:30px 18px;text-align:center;color:var(--muted);font-size:13.5px;line-height:1.55}
+
+  /* sheet */
+  .scrim{position:fixed;inset:0;background:rgba(22,20,15,.55);display:flex;align-items:flex-end;justify-content:center;z-index:50;backdrop-filter:blur(2px)}
+  .sheet{background:var(--bone);width:100%;max-width:472px;border-radius:16px 16px 0 0;border-top:3px solid var(--orange);
+    padding:20px 18px calc(24px + env(safe-area-inset-bottom));max-height:92vh;overflow-y:auto;animation:rise .22s ease}
+  @keyframes rise{from{transform:translateY(30px);opacity:.6}to{transform:translateY(0);opacity:1}}
+  .sheet h2{font-family:'Saira Condensed',sans-serif;font-size:20px;font-weight:700;text-transform:uppercase;letter-spacing:.03em;margin-bottom:3px}
+  .sheet .hint{font-size:12.5px;color:var(--muted);margin-bottom:16px;line-height:1.55}
+  .field{margin-bottom:14px}
+  .field label{display:block;font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;color:var(--muted);margin-bottom:6px;text-transform:uppercase;letter-spacing:.04em}
+  .field .ctrl{position:relative;display:flex;align-items:center}
+  .field .pre{position:absolute;left:13px;font-size:14px;color:var(--orange);font-weight:700;pointer-events:none;font-family:'JetBrains Mono',monospace}
+  .field input{width:100%;font-family:'JetBrains Mono',monospace;font-size:16px;font-weight:700;
+    padding:11px 12px 11px 34px;border:1.5px solid var(--ink);border-radius:9px;background:#fff;color:var(--ink)}
+  .field input:focus{outline:none;border-color:var(--orange);box-shadow:0 0 0 3px rgba(242,84,27,.16)}
+  .quick{display:flex;gap:7px;margin-top:8px;flex-wrap:wrap}
+  .chip{font-family:'JetBrains Mono',monospace;font-size:12.5px;font-weight:700;padding:6px 12px;border-radius:6px;cursor:pointer;
+    background:#fff;border:1.5px solid var(--ink);color:var(--ink)}
+  .chip.on{background:var(--orange);color:#fff;border-color:var(--orange)}
+  .teto-out{background:var(--ink);border-radius:9px;padding:14px 15px;margin-top:6px;display:flex;align-items:baseline;justify-content:space-between}
+  .teto-out .tl{font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;color:var(--orange);text-transform:uppercase;letter-spacing:.08em}
+  .teto-out .tv{font-family:'JetBrains Mono',monospace;font-size:24px;font-weight:800;color:#fff}
+  .teto-out .tv .cur{font-size:14px;color:var(--orange)}
+  .sheet-actions{display:flex;gap:9px;margin-top:18px}
+  .btn-save{flex:1;background:var(--orange);color:#fff;padding:13px}
+  .btn-ghost{background:var(--ink);color:var(--bone);padding:13px 18px}
+  .divider{height:3px;background:var(--hazard);margin:20px 0 16px;border-radius:2px}
+  .backup-row{display:flex;gap:9px}
+  .backup-row .btn{flex:1;background:#fff;border:1.5px solid var(--ink);color:var(--ink);padding:12px;font-size:13px}
+  .danger{width:100%;margin-top:10px;background:none;border:none;color:var(--red);font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:700;cursor:pointer;padding:8px;text-transform:uppercase;letter-spacing:.05em}
+
+  .foot{text-align:center;font-family:'JetBrains Mono',monospace;font-size:10.5px;color:var(--muted);margin-top:20px;line-height:1.7;letter-spacing:.03em;opacity:.85}
+
+  @media (prefers-reduced-motion:reduce){.scan{display:none}.track>i{transition:none}}
+</style>
+</head>
+<body>
+<div id="root"></div>
+
+<script>
+  const KEY='orcamento-diario-v1', DIAS=30;
+  const root=document.getElementById('root');
+
+  const mem={};
+  const store={
+    get(k){ try{return localStorage.getItem(k)}catch(e){return k in mem?mem[k]:null} },
+    set(k,v){ try{localStorage.setItem(k,v)}catch(e){mem[k]=v} }
+  };
+
+  const fresh=()=>({salario:4960,divida:1500,sobra:1500,entries:[],configured:false});
+  let state=null;
+  function load(){ try{const r=store.get(KEY);state=r?JSON.parse(r):fresh();}catch(e){state=fresh();}
+    if(!state||typeof state.salario!=='number')state=fresh(); }
+  function save(){ store.set(KEY,JSON.stringify(state)); }
+
+  const variavel=()=>Math.max(0,state.salario-state.divida-state.sobra);
+  const teto=()=>variavel()/DIAS;
+  const gastoTotal=()=>state.entries.reduce((s,e)=>s+e.spent,0);
+  const diasReg=()=>state.entries.length;
+  const acumulado=()=>teto()*diasReg()-gastoTotal();
+  const disponivel=()=>teto()+acumulado();
+  const sobraProj=()=>state.sobra+acumulado();
+
+  const brl=n=>n.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
+  const brl0=n=>Math.round(n).toLocaleString('pt-BR');
+
+  function render(){
+    const disp=disponivel(),ac=acumulado(),neg=disp<0,dia=diasReg();
+    const prog=Math.min(100,(dia/DIAS)*100);
+    root.innerHTML=`
+      <div class="wrap">
+        <div class="head">
+          <div>
+            <div class="brand">ORÇA<b>MENTO</b></div>
+            <div class="sub">DIA ${String(Math.min(dia+1,DIAS)).padStart(2,'0')} / ${DIAS} · CICLO CARTÃO</div>
+          </div>
+          <button class="gear" id="gear" aria-label="Ajustes">⚙</button>
+        </div>
+
+        <div class="track"><i style="width:${prog}%"></i></div>
+
+        <div class="hero ${neg?'neg':''}">
+          <div class="scan"></div>
+          <div class="label">Disponível hoje</div>
+          <div class="big"><span class="cur">R$</span>${brl(Math.abs(disp))}${neg?'<span class="tag">no vermelho</span>':''}</div>
+          <div class="breakdown">
+            <b>R$ ${brl(teto())}</b> do teto do dia
+            ${ac>=0?` + <b>R$ ${brl(ac)}</b> que sobrou dos dias anteriores`
+                  :` − <b>R$ ${brl(-ac)}</b> que passou do teto`}
+          </div>
+          ${dia>0?`<span class="pill ${ac>=0?'up':'down'}">${ac>=0?'▲ adiantado · ':'▼ estourado · '}R$ ${brl(Math.abs(ac))}</span>`:''}
+        </div>
+
+        <div class="log">
+          <div class="q">Quanto gastei hoje?</div>
+          <div class="inrow">
+            <div class="infield"><span class="pre">R$</span>
+              <input id="spend" class="mono" type="number" inputmode="decimal" placeholder="0,00" step="0.01" min="0"></div>
+            <button class="btn btn-go" id="logBtn">Registrar</button>
+          </div>
+          <button class="btn btn-zero" id="zeroBtn">Não gastei nada → rola pra amanhã</button>
+        </div>
+
+        <div class="grid">
+          <div class="stat"><div class="k">Saldo acumulado</div>
+            <div class="v ${ac>=0?'green':'coral'}">R$ ${brl0(ac)}</div>
+            <div class="sub">${ac>=0?'sobrando do teto':'acima do teto'}</div></div>
+          <div class="stat"><div class="k">Sobra projetada</div>
+            <div class="v ${sobraProj()>=state.sobra?'green':'coral'}">R$ ${brl0(sobraProj())}</div>
+            <div class="sub">no próximo salário</div></div>
+        </div>
+
+        <div class="hist-h"><span>// Histórico</span>${dia>0?'<button id="undoBtn">Desfazer último</button>':''}</div>
+        <div class="hist">${renderHist()}</div>
+
+        <div class="foot">SALVO NESTE APARELHO · FAÇA BACKUP NO ⚙<br>ESTIMATIVAS — CONFIRME COM O RH</div>
+      </div>`;
+
+    document.getElementById('gear').onclick=openSheet;
+    document.getElementById('logBtn').onclick=()=>logDay(false);
+    document.getElementById('zeroBtn').onclick=()=>logDay(true);
+    const sp=document.getElementById('spend');
+    sp.onkeydown=e=>{if(e.key==='Enter')logDay(false)};
+    if(dia>0)document.getElementById('undoBtn').onclick=undo;
+  }
+
+  function renderHist(){
+    if(!state.entries.length)
+      return '<div class="empty">Nenhum dia registrado.<br>Marque o gasto de hoje acima.</div>';
+    let run=0;const t=teto();
+    return state.entries.map(e=>{
+      run+=t-e.spent;const pos=run>=0;
+      return `<div class="row"><div class="d">DIA ${String(e.day).padStart(2,'0')}</div>
+        <div class="amt">${e.spent===0?'—':'R$ '+brl(e.spent)}</div>
+        <div class="roll ${pos?'green':'coral'}">${pos?'+':'−'} R$ ${brl(Math.abs(run))}</div></div>`;
+    }).reverse().join('');
+  }
+
+  function logDay(zero){
+    const inp=document.getElementById('spend');
+    let v=zero?0:parseFloat((inp.value||'').replace(',','.'));
+    if(!zero&&(isNaN(v)||v<0)){inp.focus();return;}
+    state.entries.push({day:state.entries.length+1,spent:v});
+    save();render();
+  }
+  function undo(){state.entries.pop();save();render();}
+
+  function openSheet(){
+    const first=!state.configured;
+    const div=document.createElement('div');div.className='scrim';div.id='scrim';
+    div.innerHTML=`
+      <div class="sheet" id="sheet">
+        <h2>${first?'Configurar':'// Ajustes'}</h2>
+        <div class="hint">Teto diário = (salário − dívida fixa − o que quer que sobre) ÷ 30.</div>
+        <div class="field"><label>Salário líquido</label>
+          <div class="ctrl"><span class="pre">R$</span><input id="cf-sal" class="mono" type="number" value="${state.salario}"></div></div>
+        <div class="field"><label>Dívida fixa (vai pro cartão)</label>
+          <div class="ctrl"><span class="pre">R$</span><input id="cf-div" class="mono" type="number" value="${state.divida}"></div>
+        <div class="field"><label>Quanto quer que sobre</label>
+          <div class="ctrl"><span class="pre">R$</span><input id="cf-sob" class="mono" type="number" value="${state.sobra}"></div>
+        <div class="teto-out"><span class="tl">Teto / dia</span>
+          <span class="tv"><span class="cur">R$ </span><span id="tetoPrev">0,00</span></span></div>
+        <div class="sheet-actions">
+          <button class="btn btn-save" id="saveCfg">${first?'Começar':'Salvar'}</button>
+          ${first?'':'<button class="btn btn-ghost" id="closeCfg">Fechar</button>'}
+        </div>
+        ${first?'':`
+        <div class="divider"></div>
+        <div class="hint" style="margin-bottom:10px">Backup — guarde no Drive/Notas e recupere ao trocar de aparelho.</div>
+        <div class="backup-row">
+          <button class="btn" id="expBtn">⬇ Exportar</button>
+          <button class="btn" id="impBtn">⬆ Importar</button>
+        </div>
+        <input type="file" id="impFile" accept="application/json" style="display:none">
+        <button class="danger" id="resetBtn">Zerar tudo e recomeçar ciclo</button>`}
+      </div>`;
+    document.body.appendChild(div);
+    div.onclick=e=>{if(e.target===div&&!first)close();};
+
+    const sal=qs('cf-sal'),dv=qs('cf-div'),sb=qs('cf-sob'),prev=qs('tetoPrev');
+    const upd=()=>{
+      prev.textContent=(Math.max(0,(+sal.value||0)-(+dv.value||0)-(+sb.value||0))/DIAS)
+        .toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
+      chips('divChips',dv);chips('sobChips',sb);
+    };
+    [sal,dv,sb].forEach(el=>el.oninput=upd);
+    bindChips('divChips',dv,upd);bindChips('sobChips',sb,upd);
+    upd();
+
+    qs('saveCfg').onclick=()=>{
+      state.salario=+sal.value||0;state.divida=+dv.value||0;state.sobra=+sb.value||0;
+      state.configured=true;save();close();render();
+    };
+    if(!first){
+      qs('closeCfg').onclick=close;
+      qs('expBtn').onclick=exportData;
+      qs('impBtn').onclick=()=>qs('impFile').click();
+      qs('impFile').onchange=importData;
+      qs('resetBtn').onclick=()=>{if(confirm('Apagar todos os dias e valores?')){state=fresh();save();close();render();}};
+    }
+    function close(){div.remove();}
+    window._closeSheet=close;
+  }
+  const qs=id=>document.getElementById(id);
+  function chips(box,inp){document.querySelectorAll('#'+box+' .chip').forEach(c=>c.classList.toggle('on',+c.dataset.v===+inp.value));}
+  function bindChips(box,inp,upd){document.querySelectorAll('#'+box+' .chip').forEach(c=>c.onclick=()=>{inp.value=c.dataset.v;upd();});}
+
+  function exportData(){
+    const blob=new Blob([JSON.stringify(state,null,2)],{type:'application/json'});
+    const url=URL.createObjectURL(blob),a=document.createElement('a');
+    const d=new Date().toISOString().slice(0,10);
+    a.href=url;a.download=`orcamento-backup-${d}.json`;a.click();
+    setTimeout(()=>URL.revokeObjectURL(url),1000);
+  }
+  function importData(ev){
+    const f=ev.target.files[0];if(!f)return;
+    const r=new FileReader();
+    r.onload=()=>{try{
+      const data=JSON.parse(r.result);
+      if(typeof data.salario!=='number'||!Array.isArray(data.entries))throw 0;
+      state=data;save();if(window._closeSheet)window._closeSheet();render();
+      alert('Backup restaurado com sucesso.');
+    }catch(e){alert('Arquivo inválido. Use um backup exportado por este app.');}};
+    r.readAsText(f);
+  }
+
+  load();render();
+</script>
+</body>
+</html>
