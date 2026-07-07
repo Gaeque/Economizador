@@ -182,6 +182,15 @@
   const disponivel=()=>teto()+acumulado();
   const sobraProj=()=>state.sobra+acumulado();
 
+  // aceita "28,50" ou "28.50" e ignora lixo (R$, espaços). Se tiver os dois, ponto=milhar.
+  function parseNum(raw){
+    if(raw==null)return NaN;
+    let s=String(raw).trim().replace(/[^0-9.,]/g,'');
+    if(s==='')return NaN;
+    if(s.includes(',')){ s=s.replace(/\./g,'').replace(',','.'); } // vírgula é decimal
+    return parseFloat(s);
+  }
+
   const brl=n=>n.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
   const brl0=n=>Math.round(n).toLocaleString('pt-BR');
 
@@ -216,7 +225,7 @@
           <div class="q">Quanto gastei hoje?</div>
           <div class="inrow">
             <div class="infield"><span class="pre">R$</span>
-              <input id="spend" class="mono" type="number" inputmode="decimal" placeholder="0,00" step="0.01" min="0"></div>
+              <input id="spend" class="mono" type="text" inputmode="decimal" autocomplete="off" placeholder="0,00"></div>
             <button class="btn btn-go" id="logBtn">Registrar</button>
           </div>
           <button class="btn btn-zero" id="zeroBtn">Não gastei nada → rola pra amanhã</button>
@@ -259,7 +268,7 @@
 
   function logDay(zero){
     const inp=document.getElementById('spend');
-    let v=zero?0:parseFloat((inp.value||'').replace(',','.'));
+    let v=zero?0:parseNum(inp.value);
     if(!zero&&(isNaN(v)||v<0)){inp.focus();return;}
     state.entries.push({day:state.entries.length+1,spent:v});
     save();render();
@@ -274,11 +283,11 @@
         <h2>${first?'Configurar':'// Ajustes'}</h2>
         <div class="hint">Teto diário = (salário − dívida fixa − o que quer que sobre) ÷ 30.</div>
         <div class="field"><label>Salário líquido</label>
-          <div class="ctrl"><span class="pre">R$</span><input id="cf-sal" class="mono" type="number" value="${state.salario}"></div></div>
+          <div class="ctrl"><span class="pre">R$</span><input id="cf-sal" class="mono" type="text" inputmode="decimal" autocomplete="off" value="${state.salario}"></div></div>
         <div class="field"><label>Dívida fixa (vai pro cartão)</label>
-          <div class="ctrl"><span class="pre">R$</span><input id="cf-div" class="mono" type="number" value="${state.divida}"></div>
+          <div class="ctrl"><span class="pre">R$</span><input id="cf-div" class="mono" type="text" inputmode="decimal" autocomplete="off" value="${state.divida}"></div>
         <div class="field"><label>Quanto quer que sobre</label>
-          <div class="ctrl"><span class="pre">R$</span><input id="cf-sob" class="mono" type="number" value="${state.sobra}"></div>
+          <div class="ctrl"><span class="pre">R$</span><input id="cf-sob" class="mono" type="text" inputmode="decimal" autocomplete="off" value="${state.sobra}"></div>
         <div class="teto-out"><span class="tl">Teto / dia</span>
           <span class="tv"><span class="cur">R$ </span><span id="tetoPrev">0,00</span></span></div>
         <div class="sheet-actions">
@@ -300,7 +309,7 @@
 
     const sal=qs('cf-sal'),dv=qs('cf-div'),sb=qs('cf-sob'),prev=qs('tetoPrev');
     const upd=()=>{
-      prev.textContent=(Math.max(0,(+sal.value||0)-(+dv.value||0)-(+sb.value||0))/DIAS)
+      prev.textContent=(Math.max(0,(parseNum(sal.value)||0)-(parseNum(dv.value)||0)-(parseNum(sb.value)||0))/DIAS)
         .toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
       chips('divChips',dv);chips('sobChips',sb);
     };
@@ -309,7 +318,7 @@
     upd();
 
     qs('saveCfg').onclick=()=>{
-      state.salario=+sal.value||0;state.divida=+dv.value||0;state.sobra=+sb.value||0;
+      state.salario=parseNum(sal.value)||0;state.divida=parseNum(dv.value)||0;state.sobra=parseNum(sb.value)||0;
       state.configured=true;save();close();render();
     };
     if(!first){
@@ -323,7 +332,7 @@
     window._closeSheet=close;
   }
   const qs=id=>document.getElementById(id);
-  function chips(box,inp){document.querySelectorAll('#'+box+' .chip').forEach(c=>c.classList.toggle('on',+c.dataset.v===+inp.value));}
+  function chips(box,inp){document.querySelectorAll('#'+box+' .chip').forEach(c=>c.classList.toggle('on',+c.dataset.v===parseNum(inp.value)));}
   function bindChips(box,inp,upd){document.querySelectorAll('#'+box+' .chip').forEach(c=>c.onclick=()=>{inp.value=c.dataset.v;upd();});}
 
   function exportData(){
