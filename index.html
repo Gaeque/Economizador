@@ -138,6 +138,17 @@
   .chip{font-family:'JetBrains Mono',monospace;font-size:12.5px;font-weight:700;padding:6px 12px;border-radius:6px;cursor:pointer;
     background:#fff;border:1.5px solid var(--ink);color:var(--ink)}
   .chip.on{background:var(--orange);color:#fff;border-color:var(--orange)}
+  .chip.sug{background:var(--ink);color:var(--bone);border-color:var(--ink)}
+  /* mix 50/30/20 no sheet */
+  .mix{margin-top:12px}
+  .mixbar{display:flex;height:16px;border:1.5px solid var(--ink);border-radius:5px;overflow:hidden}
+  .mixbar i{display:block;height:100%}
+  .mixbar .mf{background:var(--ink)} .mixbar .mv{background:var(--orange)} .mixbar .ms{background:var(--green)}
+  .mixleg{display:flex;justify-content:space-between;margin-top:8px;flex-wrap:wrap;gap:6px}
+  .mixleg span{font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;display:flex;align-items:center;gap:5px}
+  .mixleg b{width:9px;height:9px;border-radius:2px;display:inline-block}
+  .mixleg .df{background:var(--ink)} .mixleg .dv{background:var(--orange)} .mixleg .ds{background:var(--green)}
+  .mixideal{font-family:'JetBrains Mono',monospace;font-size:10.5px;color:var(--muted);font-weight:600;margin-top:6px;letter-spacing:.05em;text-align:right}
   .teto-out{background:var(--ink);border-radius:9px;padding:14px 15px;margin-top:6px;display:flex;align-items:baseline;justify-content:space-between}
   .teto-out .tl{font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;color:var(--orange);text-transform:uppercase;letter-spacing:.08em}
   .teto-out .tv{font-family:'JetBrains Mono',monospace;font-size:24px;font-weight:800;color:#fff}
@@ -149,6 +160,24 @@
   .backup-row{display:flex;gap:9px}
   .backup-row .btn{flex:1;background:#fff;border:1.5px solid var(--ink);color:var(--ink);padding:12px;font-size:13px}
   .danger{width:100%;margin-top:10px;background:none;border:none;color:var(--red);font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:700;cursor:pointer;padding:8px;text-transform:uppercase;letter-spacing:.05em}
+
+  /* saúde 50/30/20 */
+  .health{background:var(--bone-2);border:1.5px solid var(--ink);border-radius:14px;padding:16px 16px 6px}
+  .hb{margin-bottom:15px}
+  .hb-top{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px}
+  .hb-label{font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:var(--ink)}
+  .hb-pct{font-family:'JetBrains Mono',monospace;font-size:14px;font-weight:800}
+  .hb-pct small{font-size:10px;font-weight:600;color:var(--muted)}
+  .hb-pct.ok{color:var(--green)} .hb-pct.warn{color:#c98a1e} .hb-pct.bad{color:var(--red)}
+  .hb-track{position:relative;height:9px;background:#d9d5c8;border:1.5px solid var(--ink);border-radius:3px;overflow:hidden}
+  .hb-track .fill{display:block;height:100%;transition:width .4s ease}
+  .hb-track .fill.ok{background:var(--green)} .hb-track .fill.warn{background:#e0a52b} .hb-track .fill.bad{background:var(--red)}
+  .hb-track .ideal{position:absolute;top:-2px;bottom:-2px;width:2px;background:var(--ink);opacity:.85}
+  .hb-val{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted);font-weight:600;margin-top:4px}
+  .hmsg{font-size:12px;line-height:1.5;padding:10px 12px;border-radius:8px;margin:4px 0 10px;border-left:3px solid}
+  .hmsg.ok{background:rgba(47,174,106,.1);border-color:var(--green);color:#1c5638}
+  .hmsg.warn{background:rgba(224,165,43,.12);border-color:#e0a52b;color:#7a5410}
+  .hmsg.bad{background:rgba(226,59,44,.1);border-color:var(--red);color:#8f2a20}
 
   .foot{text-align:center;font-family:'JetBrains Mono',monospace;font-size:10.5px;color:var(--muted);margin-top:20px;line-height:1.7;letter-spacing:.03em;opacity:.85}
 
@@ -181,6 +210,19 @@
   const acumulado=()=>teto()*diasReg()-gastoTotal();
   const disponivel=()=>teto()+acumulado();
   const sobraProj=()=>state.sobra+acumulado();
+
+  // --- camada 50/30/20 ---
+  const IDEAL={fix:.50,var:.30,save:.20};
+  const pctFix=()=>state.salario?state.divida/state.salario:0;
+  const pctVar=()=>state.salario?variavel()/state.salario:0;
+  const pctSave=()=>state.salario?state.sobra/state.salario:0;
+  // folga nas fixas: quanto das "necessidades" (50%) sobrou e virou dia a dia
+  const folgaFix=()=>Math.max(0,IDEAL.fix*state.salario-state.divida);
+  function status(pct,ideal,invert){
+    // invert=true (guardar): mais é melhor. senão: menos é melhor.
+    if(invert){ if(pct>=ideal)return'ok'; if(pct>=ideal*.6)return'warn'; return'bad'; }
+    if(pct<=ideal)return'ok'; if(pct<=ideal*1.2)return'warn'; return'bad';
+  }
 
   // aceita "28,50" ou "28.50" e ignora lixo (R$, espaços). Se tiver os dois, ponto=milhar.
   function parseNum(raw){
@@ -240,7 +282,10 @@
             <div class="sub">no próximo salário</div></div>
         </div>
 
-        <div class="hist-h"><span>// Histórico</span>${dia>0?'<button id="undoBtn">Desfazer último</button>':''}</div>
+        <div class="hist-h" style="margin-top:20px"><span>// Saúde do mês · 50/30/20</span></div>
+        <div class="health">${renderHealth()}</div>
+
+        <div class="hist-h" style="margin-top:20px"><span>// Histórico</span>${dia>0?'<button id="undoBtn">Desfazer último</button>':''}</div>
         <div class="hist">${renderHist()}</div>
 
         <div class="foot">SALVO NESTE APARELHO · FAÇA BACKUP NO ⚙<br>ESTIMATIVAS — CONFIRME COM O RH</div>
@@ -266,6 +311,41 @@
     }).reverse().join('');
   }
 
+  function bar(label,val,pct,ideal,invert){
+    const st=status(pct,ideal,invert);
+    const fill=Math.min(100,pct*100);
+    const mark=ideal*100;
+    return `<div class="hb">
+      <div class="hb-top">
+        <span class="hb-label">${label}</span>
+        <span class="hb-pct ${st}">${Math.round(pct*100)}% <small>/ ${Math.round(ideal*100)}%</small></span>
+      </div>
+      <div class="hb-track">
+        <i class="fill ${st}" style="width:${fill}%"></i>
+        <span class="ideal" style="left:${mark}%"></span>
+      </div>
+      <div class="hb-val">R$ ${brl0(val)}</div>
+    </div>`;
+  }
+  function renderHealth(){
+    if(!state.salario) return '';
+    const folga=folgaFix();
+    let msg='';
+    if(state.divida<=IDEAL.fix*state.salario){
+      msg=`<div class="hmsg ok">✓ Fixas enxutas — R$ ${brl0(folga)} abaixo do teto de necessidades. Essa folga virou dia a dia, e seu guardado (R$ ${brl0(state.sobra)}) segue intacto.</div>`;
+    }else{
+      const excesso=state.divida-IDEAL.fix*state.salario;
+      msg=`<div class="hmsg bad">⚠ Fixas R$ ${brl0(excesso)} acima do ideal (${Math.round(pctFix()*100)}%). Aperte aqui ou no dia a dia pra proteger o guardado.</div>`;
+    }
+    if(pctSave()<IDEAL.save)
+      msg+=`<div class="hmsg warn">Guardando ${Math.round(pctSave()*100)}% (ideal 20%). Enquanto sai do cartão, tudo bem — esse valor está matando o ciclo, não investindo ainda.</div>`;
+    return `
+      ${bar('Fixas · necessidades',state.divida,pctFix(),IDEAL.fix,false)}
+      ${bar('Dia a dia · desejos',variavel(),pctVar(),IDEAL.var,false)}
+      ${bar('Guardar · investir',state.sobra,pctSave(),IDEAL.save,true)}
+      ${msg}`;
+  }
+
   function logDay(zero){
     const inp=document.getElementById('spend');
     let v=zero?0:parseNum(inp.value);
@@ -286,10 +366,13 @@
           <div class="ctrl"><span class="pre">R$</span><input id="cf-sal" class="mono" type="text" inputmode="decimal" autocomplete="off" value="${state.salario}"></div></div>
         <div class="field"><label>Dívida fixa (vai pro cartão)</label>
           <div class="ctrl"><span class="pre">R$</span><input id="cf-div" class="mono" type="text" inputmode="decimal" autocomplete="off" value="${state.divida}"></div>
+          <div class="quick" id="divChips">${[1500,1700,2000].map(v=>`<span class="chip" data-v="${v}">${v}</span>`).join('')}</div></div>
         <div class="field"><label>Quanto quer que sobre</label>
           <div class="ctrl"><span class="pre">R$</span><input id="cf-sob" class="mono" type="text" inputmode="decimal" autocomplete="off" value="${state.sobra}"></div>
+          <div class="quick" id="sobChips">${[1000,1500].map(v=>`<span class="chip" data-v="${v}">${v}</span>`).join('')}<span class="chip sug" id="sug20">◎ 20% do salário</span></div></div>
         <div class="teto-out"><span class="tl">Teto / dia</span>
           <span class="tv"><span class="cur">R$ </span><span id="tetoPrev">0,00</span></span></div>
+        <div id="mix" class="mix"></div>
         <div class="sheet-actions">
           <button class="btn btn-save" id="saveCfg">${first?'Começar':'Salvar'}</button>
           ${first?'':'<button class="btn btn-ghost" id="closeCfg">Fechar</button>'}
@@ -307,14 +390,28 @@
     document.body.appendChild(div);
     div.onclick=e=>{if(e.target===div&&!first)close();};
 
-    const sal=qs('cf-sal'),dv=qs('cf-div'),sb=qs('cf-sob'),prev=qs('tetoPrev');
+    const sal=qs('cf-sal'),dv=qs('cf-div'),sb=qs('cf-sob'),prev=qs('tetoPrev'),mix=qs('mix');
     const upd=()=>{
-      prev.textContent=(Math.max(0,(parseNum(sal.value)||0)-(parseNum(dv.value)||0)-(parseNum(sb.value)||0))/DIAS)
-        .toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
+      const S=parseNum(sal.value)||0, D=parseNum(dv.value)||0, B=parseNum(sb.value)||0;
+      const V=Math.max(0,S-D-B);
+      prev.textContent=(V/DIAS).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
       chips('divChips',dv);chips('sobChips',sb);
+      if(S>0){
+        const seg=(cls,val)=>`<i class="${cls}" style="width:${Math.min(100,val/S*100)}%"></i>`;
+        const p=n=>Math.round(n/S*100);
+        mix.innerHTML=`
+          <div class="mixbar">${seg('mf',D)}${seg('mv',V)}${seg('ms',B)}</div>
+          <div class="mixleg">
+            <span><b class="df"></b>Fixas ${p(D)}%</span>
+            <span><b class="dv"></b>Dia a dia ${p(V)}%</span>
+            <span><b class="ds"></b>Guardar ${p(B)}%</span>
+          </div>
+          <div class="mixideal">Ideal: 50 / 30 / 20</div>`;
+      } else mix.innerHTML='';
     };
     [sal,dv,sb].forEach(el=>el.oninput=upd);
     bindChips('divChips',dv,upd);bindChips('sobChips',sb,upd);
+    qs('sug20').onclick=()=>{const S=parseNum(sal.value)||0; if(S>0){sb.value=Math.round(S*.2); upd();}};
     upd();
 
     qs('saveCfg').onclick=()=>{
