@@ -149,6 +149,13 @@
   .mixleg b{width:9px;height:9px;border-radius:2px;display:inline-block}
   .mixleg .df{background:var(--ink)} .mixleg .dv{background:var(--orange)} .mixleg .ds{background:var(--green)}
   .mixideal{font-family:'JetBrains Mono',monospace;font-size:10.5px;color:var(--muted);font-weight:600;margin-top:6px;letter-spacing:.05em;text-align:right}
+  input::placeholder{color:#b9b4a6;font-weight:500}
+  .cyc{display:flex;gap:9px}
+  .cyc-col{flex:1;min-width:0}
+  .cyc-k{display:block;font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:600;color:var(--muted);margin-bottom:4px;letter-spacing:.04em}
+  .field .cyc input{padding-left:12px}
+  .cyc-hint{font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:600;color:var(--muted);margin-top:8px;letter-spacing:.02em}
+  .cyc-hint.bad{color:var(--red)}
   .teto-out{background:var(--ink);border-radius:9px;padding:14px 15px;margin-top:6px;display:flex;align-items:baseline;justify-content:space-between}
   .teto-out .tl{font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;color:var(--orange);text-transform:uppercase;letter-spacing:.08em}
   .teto-out .tv{font-family:'JetBrains Mono',monospace;font-size:24px;font-weight:800;color:#fff}
@@ -188,7 +195,7 @@
 <div id="root"></div>
 
 <script>
-  const KEY='orcamento-diario-v1', DIAS=30;
+  const KEY='orcamento-diario-v1', CICLO_CHEIO=30;
   const root=document.getElementById('root');
 
   const mem={};
@@ -197,14 +204,37 @@
     set(k,v){ try{localStorage.setItem(k,v)}catch(e){mem[k]=v} }
   };
 
-  const fresh=()=>({salario:4960,divida:1500,sobra:1500,entries:[],configured:false});
+  // --- ciclo do cartão ---
+  // dias de hoje até o próximo "dia que vira" (se o mês não tiver esse dia, usa o último dia do mês)
+  function diasAte(vira){
+    const hoje=new Date();hoje.setHours(0,0,0,0);
+    const alvo=(ano,mes)=>new Date(ano,mes,Math.min(vira,new Date(ano,mes+1,0).getDate()));
+    let t=alvo(hoje.getFullYear(),hoje.getMonth());
+    if(t<=hoje)t=alvo(hoje.getFullYear(),hoje.getMonth()+1);
+    return Math.round((t-hoje)/86400000);
+  }
+  // dia válido entre 1 e 31, ou 0 se vazio/inválido
+  const lerVira=v=>{const n=Math.round(v);return n>=1&&n<=31?n:0;};
+
+  // começa vazio: nada é preenchido até o usuário configurar
+  const fresh=()=>({salario:0,divida:0,sobra:0,entries:[],configured:false,vira:null,dias:null});
+  // dados antigos (já configurados, sem ciclo) continuam valendo como ciclo cheio de 30 dias
+  function normalize(s){
+    if(s.configured){
+      if(typeof s.vira!=='number')s.vira=30;
+      if(typeof s.dias!=='number'||s.dias<1)s.dias=CICLO_CHEIO;
+    }
+    return s;
+  }
   let state=null;
   function load(){ try{const r=store.get(KEY);state=r?JSON.parse(r):fresh();}catch(e){state=fresh();}
-    if(!state||typeof state.salario!=='number')state=fresh(); }
+    if(!state||typeof state.salario!=='number')state=fresh();
+    normalize(state); }
   function save(){ store.set(KEY,JSON.stringify(state)); }
 
+  const DIAS=()=>state.dias;
   const variavel=()=>Math.max(0,state.salario-state.divida-state.sobra);
-  const teto=()=>variavel()/DIAS;
+  const teto=()=>variavel()/DIAS();
   const gastoTotal=()=>state.entries.reduce((s,e)=>s+e.spent,0);
   const diasReg=()=>state.entries.length;
   const acumulado=()=>teto()*diasReg()-gastoTotal();
@@ -237,14 +267,29 @@
   const brl0=n=>Math.round(n).toLocaleString('pt-BR');
 
   function render(){
+    if(!state.configured){
+      root.innerHTML=`
+        <div class="wrap">
+          <div class="head"><div>
+            <div class="brand">ORÇA<b>MENTO</b></div>
+            <div class="sub">CONFIGURAÇÃO INICIAL</div></div></div>
+          <div class="hero"><div class="scan"></div>
+            <div class="label">Primeiro acesso</div>
+            <div class="breakdown">Informe seu salário, as contas fixas, quanto quer guardar e o ciclo do cartão para calcular o teto diário.</div></div>
+          <button class="btn btn-go" id="startBtn" style="width:100%;padding:14px">Configurar</button>
+        </div>`;
+      qs('startBtn').onclick=openSheet;
+      openSheet();
+      return;
+    }
     const disp=disponivel(),ac=acumulado(),neg=disp<0,dia=diasReg();
-    const prog=Math.min(100,(dia/DIAS)*100);
+    const N=DIAS(),prog=Math.min(100,(dia/N)*100);
     root.innerHTML=`
       <div class="wrap">
         <div class="head">
           <div>
             <div class="brand">ORÇA<b>MENTO</b></div>
-            <div class="sub">DIA ${String(Math.min(dia+1,DIAS)).padStart(2,'0')} / ${DIAS} · CICLO CARTÃO</div>
+            <div class="sub">DIA ${String(Math.min(dia+1,N)).padStart(2,'0')} / ${String(N).padStart(2,'0')} · VIRA DIA ${state.vira}</div>
           </div>
           <button class="gear" id="gear" aria-label="Ajustes">⚙</button>
         </div>
@@ -356,20 +401,33 @@
   function undo(){state.entries.pop();save();render();}
 
   function openSheet(){
+    if(qs('scrim'))return;
     const first=!state.configured;
+    const val=n=>first||n==null?'':n;  // 1º acesso: campos vazios
     const div=document.createElement('div');div.className='scrim';div.id='scrim';
     div.innerHTML=`
       <div class="sheet" id="sheet">
         <h2>${first?'Configurar':'// Ajustes'}</h2>
-        <div class="hint">Teto diário = (salário − dívida fixa − o que quer que sobre) ÷ 30.</div>
+        <div class="hint">Teto diário = (salário − dívida fixa − o que quer que sobre) ÷ dias do ciclo.</div>
         <div class="field"><label>Salário líquido</label>
-          <div class="ctrl"><span class="pre">R$</span><input id="cf-sal" class="mono" type="text" inputmode="decimal" autocomplete="off" value="${state.salario}"></div></div>
+          <div class="ctrl"><span class="pre">R$</span><input id="cf-sal" class="mono" type="text" inputmode="decimal" autocomplete="off" placeholder="0,00" value="${val(state.salario)}"></div></div>
         <div class="field"><label>Dívida fixa (vai pro cartão)</label>
-          <div class="ctrl"><span class="pre">R$</span><input id="cf-div" class="mono" type="text" inputmode="decimal" autocomplete="off" value="${state.divida}"></div>
-          <div class="quick" id="divChips">${[1500,1700,2000].map(v=>`<span class="chip" data-v="${v}">${v}</span>`).join('')}</div></div>
+          <div class="ctrl"><span class="pre">R$</span><input id="cf-div" class="mono" type="text" inputmode="decimal" autocomplete="off" placeholder="0,00" value="${val(state.divida)}"></div></div>
         <div class="field"><label>Quanto quer que sobre</label>
-          <div class="ctrl"><span class="pre">R$</span><input id="cf-sob" class="mono" type="text" inputmode="decimal" autocomplete="off" value="${state.sobra}"></div>
-          <div class="quick" id="sobChips">${[1000,1500].map(v=>`<span class="chip" data-v="${v}">${v}</span>`).join('')}<span class="chip sug" id="sug20">◎ 20% do salário</span></div></div>
+          <div class="ctrl"><span class="pre">R$</span><input id="cf-sob" class="mono" type="text" inputmode="decimal" autocomplete="off" placeholder="0,00" value="${val(state.sobra)}"></div>
+          <div class="quick"><span class="chip sug" id="sug20">◎ 20% do salário</span></div></div>
+        <div class="field"><label>Ciclo do cartão</label>
+          <div class="cyc">
+            <div class="cyc-col"><span class="cyc-k">Vira no dia</span>
+              <input id="cf-vira" class="mono" type="text" inputmode="numeric" autocomplete="off" placeholder="ex: 30" value="${val(state.vira)}"></div>
+            <div class="cyc-col"><span class="cyc-k">Dias neste ciclo</span>
+              <input id="cf-dias" class="mono" type="text" inputmode="numeric" autocomplete="off" placeholder="—" value="${val(state.dias)}"></div>
+          </div>
+          <div class="quick">
+            <span class="chip" id="chAte"></span>
+            <span class="chip" id="chCheio">Ciclo cheio · ${CICLO_CHEIO} dias</span>
+          </div>
+          <div class="cyc-hint" id="cycHint"></div></div>
         <div class="teto-out"><span class="tl">Teto / dia</span>
           <span class="tv"><span class="cur">R$ </span><span id="tetoPrev">0,00</span></span></div>
         <div id="mix" class="mix"></div>
@@ -377,25 +435,38 @@
           <button class="btn btn-save" id="saveCfg">${first?'Começar':'Salvar'}</button>
           ${first?'':'<button class="btn btn-ghost" id="closeCfg">Fechar</button>'}
         </div>
-        ${first?'':`
         <div class="divider"></div>
-        <div class="hint" style="margin-bottom:10px">Backup — guarde no Drive/Notas e recupere ao trocar de aparelho.</div>
+        <div class="hint" style="margin-bottom:10px">${first
+          ?'Já usava em outro aparelho? Importe o backup e pule a configuração.'
+          :'Backup — guarde no Drive/Notas e recupere ao trocar de aparelho.'}</div>
         <div class="backup-row">
-          <button class="btn" id="expBtn">⬇ Exportar</button>
+          ${first?'':'<button class="btn" id="expBtn">⬇ Exportar</button>'}
           <button class="btn" id="impBtn">⬆ Importar</button>
         </div>
         <input type="file" id="impFile" accept="application/json" style="display:none">
-        <button class="danger" id="resetBtn">Zerar tudo e recomeçar ciclo</button>`}
+        <div class="cyc-hint bad" id="cfgErr" style="text-align:center"></div>
+        ${first?'':'<button class="danger" id="resetBtn">Zerar tudo e recomeçar ciclo</button>'}
       </div>`;
     document.body.appendChild(div);
     div.onclick=e=>{if(e.target===div&&!first)close();};
 
     const sal=qs('cf-sal'),dv=qs('cf-div'),sb=qs('cf-sob'),prev=qs('tetoPrev'),mix=qs('mix');
+    const vi=qs('cf-vira'),di=qs('cf-dias'),chAte=qs('chAte'),chCheio=qs('chCheio'),cycHint=qs('cycHint');
+    const lerDias=()=>{const n=Math.round(parseNum(di.value));return n>=1?n:0;};
     const upd=()=>{
       const S=parseNum(sal.value)||0, D=parseNum(dv.value)||0, B=parseNum(sb.value)||0;
-      const V=Math.max(0,S-D-B);
-      prev.textContent=(V/DIAS).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
-      chips('divChips',dv);chips('sobChips',sb);
+      const V=Math.max(0,S-D-B), N=lerDias(), vira=lerVira(parseNum(vi.value)), ate=vira?diasAte(vira):0;
+      prev.textContent=N?(V/N).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2}):'—';
+      chAte.style.display=vira?'':'none';
+      chAte.textContent=`Hoje até dia ${vira} · ${ate} dias`;
+      chAte.classList.toggle('on',!!vira&&N===ate);
+      chCheio.classList.toggle('on',N===CICLO_CHEIO&&ate!==CICLO_CHEIO);
+      const dReg=diasReg();
+      cycHint.textContent=!vira?'Informe o dia em que o cartão vira (1 a 31).'
+        :!N?'Informe quantos dias tem este ciclo.'
+        :dReg>N?`Você já registrou ${dReg} dias, mais do que os ${N} do ciclo.`
+        :`${V?'R$ '+brl(V):'R$ 0,00'} divididos em ${N} dias.`;
+      cycHint.classList.toggle('bad',(vi.value.trim()!==''&&!vira)||(vira&&!N)||(N&&dReg>N));
       if(S>0){
         const seg=(cls,val)=>`<i class="${cls}" style="width:${Math.min(100,val/S*100)}%"></i>`;
         const p=n=>Math.round(n/S*100);
@@ -409,28 +480,35 @@
           <div class="mixideal">Ideal: 50 / 30 / 20</div>`;
       } else mix.innerHTML='';
     };
-    [sal,dv,sb].forEach(el=>el.oninput=upd);
-    bindChips('divChips',dv,upd);bindChips('sobChips',sb,upd);
+    [sal,dv,sb,di].forEach(el=>el.oninput=upd);
+    // mudar o dia que vira recalcula os dias a partir de hoje
+    vi.oninput=()=>{const v=lerVira(parseNum(vi.value));if(v)di.value=diasAte(v);upd();};
+    chAte.onclick=()=>{const v=lerVira(parseNum(vi.value));if(v){di.value=diasAte(v);upd();}};
+    chCheio.onclick=()=>{di.value=CICLO_CHEIO;upd();};
     qs('sug20').onclick=()=>{const S=parseNum(sal.value)||0; if(S>0){sb.value=Math.round(S*.2); upd();}};
     upd();
 
     qs('saveCfg').onclick=()=>{
-      state.salario=parseNum(sal.value)||0;state.divida=parseNum(dv.value)||0;state.sobra=parseNum(sb.value)||0;
+      const S=parseNum(sal.value),vira=lerVira(parseNum(vi.value)),N=lerDias(),err=qs('cfgErr');
+      const falta=!(S>0)?[sal,'Informe o salário líquido.']
+        :!vira?[vi,'Informe o dia em que o cartão vira.']
+        :!N?[di,'Informe quantos dias tem este ciclo.']:null;
+      if(falta){err.textContent=falta[1];falta[0].focus();return;}
+      state.salario=S;state.divida=parseNum(dv.value)||0;state.sobra=parseNum(sb.value)||0;
+      state.vira=vira;state.dias=N;
       state.configured=true;save();close();render();
     };
+    qs('impBtn').onclick=()=>qs('impFile').click();
+    qs('impFile').onchange=importData;
     if(!first){
       qs('closeCfg').onclick=close;
       qs('expBtn').onclick=exportData;
-      qs('impBtn').onclick=()=>qs('impFile').click();
-      qs('impFile').onchange=importData;
       qs('resetBtn').onclick=()=>{if(confirm('Apagar todos os dias e valores?')){state=fresh();save();close();render();}};
     }
     function close(){div.remove();}
     window._closeSheet=close;
   }
   const qs=id=>document.getElementById(id);
-  function chips(box,inp){document.querySelectorAll('#'+box+' .chip').forEach(c=>c.classList.toggle('on',+c.dataset.v===parseNum(inp.value)));}
-  function bindChips(box,inp,upd){document.querySelectorAll('#'+box+' .chip').forEach(c=>c.onclick=()=>{inp.value=c.dataset.v;upd();});}
 
   function exportData(){
     const blob=new Blob([JSON.stringify(state,null,2)],{type:'application/json'});
@@ -445,7 +523,7 @@
     r.onload=()=>{try{
       const data=JSON.parse(r.result);
       if(typeof data.salario!=='number'||!Array.isArray(data.entries))throw 0;
-      state=data;save();if(window._closeSheet)window._closeSheet();render();
+      state=normalize(data);save();if(window._closeSheet)window._closeSheet();render();
       alert('Backup restaurado com sucesso.');
     }catch(e){alert('Arquivo inválido. Use um backup exportado por este app.');}};
     r.readAsText(f);
