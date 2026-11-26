@@ -114,7 +114,12 @@
   .hist{background:var(--bone-2);border:1.5px solid var(--ink);border-radius:12px;overflow:hidden}
   .row{display:grid;grid-template-columns:auto 1fr auto;gap:10px;align-items:center;padding:12px 16px;border-bottom:1px solid var(--line-soft)}
   .row:last-child{border-bottom:none}
-  .row .d{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted);font-weight:700;min-width:48px;letter-spacing:.03em}
+  .row .d{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted);font-weight:700;min-width:70px;letter-spacing:.03em}
+  .when{font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:700;letter-spacing:.05em;padding:2px 7px;border-radius:4px;vertical-align:middle;margin-left:4px}
+  .when.late{background:rgba(226,59,44,.12);color:var(--red)}
+  .when.ahead{background:rgba(224,165,43,.15);color:#7a5410}
+  .field .cyc input[type=date]{-webkit-appearance:none;appearance:none;min-height:46px;text-align:left;display:block}
+  .field .cyc input[type=date]::-webkit-date-and-time-value{text-align:left}
   .row .amt{font-family:'JetBrains Mono',monospace;font-size:14px;font-weight:700;text-align:right}
   .row .roll{font-family:'JetBrains Mono',monospace;font-size:12.5px;font-weight:700;text-align:right;min-width:84px}
   .row .roll.green{color:var(--green)} .row .roll.coral{color:var(--red)}
@@ -139,7 +144,7 @@
     background:#fff;border:1.5px solid var(--ink);color:var(--ink)}
   .chip.on{background:var(--orange);color:#fff;border-color:var(--orange)}
   .chip.sug{background:var(--ink);color:var(--bone);border-color:var(--ink)}
-  /* mix 50/30/20 no sheet */
+  /* distribuição do salário no sheet */
   .mix{margin-top:12px}
   .mixbar{display:flex;height:16px;border:1.5px solid var(--ink);border-radius:5px;overflow:hidden}
   .mixbar i{display:block;height:100%}
@@ -148,7 +153,26 @@
   .mixleg span{font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;display:flex;align-items:center;gap:5px}
   .mixleg b{width:9px;height:9px;border-radius:2px;display:inline-block}
   .mixleg .df{background:var(--ink)} .mixleg .dv{background:var(--orange)} .mixleg .ds{background:var(--green)}
-  .mixideal{font-family:'JetBrains Mono',monospace;font-size:10.5px;color:var(--muted);font-weight:600;margin-top:6px;letter-spacing:.05em;text-align:right}
+  .mixwarn{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--red);font-weight:700;margin-top:8px}
+  /* caixinhas */
+  .cx-edit{display:flex;gap:7px;margin-bottom:8px;align-items:center}
+  .field .cx-edit input{padding-left:12px;font-size:16px}
+  .cx-edit .cx-nome{flex:1.3;min-width:0}
+  .cx-edit .ctrl{flex:1;min-width:0}
+  .field .cx-edit .ctrl input{padding-left:34px}
+  .cx-del{background:none;border:1.5px solid var(--ink);border-radius:8px;width:38px;height:46px;flex:none;font-size:18px;cursor:pointer;color:var(--red);font-weight:700}
+  .cx-add{width:100%;background:#fff;border:1.5px dashed var(--ink);color:var(--ink);padding:11px;font-size:13px}
+  .cxbox{background:var(--bone-2);border:1.5px solid var(--ink);border-radius:12px;overflow:hidden}
+  .cxrow{display:grid;grid-template-columns:1fr auto auto;gap:10px;align-items:center;padding:12px 14px 12px 16px;border-bottom:1px solid var(--line-soft)}
+  .cxrow:last-child{border-bottom:none}
+  .cxrow .n{font-family:'Saira Condensed',sans-serif;font-size:16px;font-weight:700;text-transform:uppercase;letter-spacing:.02em;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .cxrow .val{font-family:'JetBrains Mono',monospace;font-size:14px;font-weight:700}
+  .cxrow.done .n,.cxrow.done .val{color:var(--muted);text-decoration:line-through}
+  .cx-ok{font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;
+    padding:7px 10px;border-radius:7px;border:1.5px solid var(--ink);background:#fff;color:var(--ink);cursor:pointer;min-width:94px}
+  .cx-ok.on{background:var(--green);border-color:var(--green);color:#fff}
+  .cxtot{display:flex;justify-content:space-between;padding:11px 16px;background:var(--ink);color:var(--bone);font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:700;letter-spacing:.04em;text-transform:uppercase}
+  .cxtot b{color:#6fe0a2}
   input::placeholder{color:#b9b4a6;font-weight:500}
   .cyc{display:flex;gap:9px}
   .cyc-col{flex:1;min-width:0}
@@ -168,24 +192,6 @@
   .backup-row .btn{flex:1;background:#fff;border:1.5px solid var(--ink);color:var(--ink);padding:12px;font-size:13px}
   .danger{width:100%;margin-top:10px;background:none;border:none;color:var(--red);font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:700;cursor:pointer;padding:8px;text-transform:uppercase;letter-spacing:.05em}
 
-  /* saúde 50/30/20 */
-  .health{background:var(--bone-2);border:1.5px solid var(--ink);border-radius:14px;padding:16px 16px 6px}
-  .hb{margin-bottom:15px}
-  .hb-top{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px}
-  .hb-label{font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:var(--ink)}
-  .hb-pct{font-family:'JetBrains Mono',monospace;font-size:14px;font-weight:800}
-  .hb-pct small{font-size:10px;font-weight:600;color:var(--muted)}
-  .hb-pct.ok{color:var(--green)} .hb-pct.warn{color:#c98a1e} .hb-pct.bad{color:var(--red)}
-  .hb-track{position:relative;height:9px;background:#d9d5c8;border:1.5px solid var(--ink);border-radius:3px;overflow:hidden}
-  .hb-track .fill{display:block;height:100%;transition:width .4s ease}
-  .hb-track .fill.ok{background:var(--green)} .hb-track .fill.warn{background:#e0a52b} .hb-track .fill.bad{background:var(--red)}
-  .hb-track .ideal{position:absolute;top:-2px;bottom:-2px;width:2px;background:var(--ink);opacity:.85}
-  .hb-val{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted);font-weight:600;margin-top:4px}
-  .hmsg{font-size:12px;line-height:1.5;padding:10px 12px;border-radius:8px;margin:4px 0 10px;border-left:3px solid}
-  .hmsg.ok{background:rgba(47,174,106,.1);border-color:var(--green);color:#1c5638}
-  .hmsg.warn{background:rgba(224,165,43,.12);border-color:#e0a52b;color:#7a5410}
-  .hmsg.bad{background:rgba(226,59,44,.1);border-color:var(--red);color:#8f2a20}
-
   .foot{text-align:center;font-family:'JetBrains Mono',monospace;font-size:10.5px;color:var(--muted);margin-top:20px;line-height:1.7;letter-spacing:.03em;opacity:.85}
 
   @media (prefers-reduced-motion:reduce){.scan{display:none}.track>i{transition:none}}
@@ -195,7 +201,7 @@
 <div id="root"></div>
 
 <script>
-  const KEY='orcamento-diario-v1', CICLO_CHEIO=30;
+  const KEY='orcamento-diario-v1';
   const root=document.getElementById('root');
 
   const mem={};
@@ -204,25 +210,49 @@
     set(k,v){ try{localStorage.setItem(k,v)}catch(e){mem[k]=v} }
   };
 
+  // --- datas ---
+  const pad2=n=>String(n).padStart(2,'0');
+  const hoje0=()=>{const d=new Date();d.setHours(0,0,0,0);return d;};
+  const iso=d=>`${d.getFullYear()}-${pad2(d.getMonth()+1)}-${pad2(d.getDate())}`;
+  const deIso=t=>{const m=/^(\d{4})-(\d{2})-(\d{2})$/.exec(t||'');return m?new Date(+m[1],m[2]-1,+m[3]):null;};
+  const addDias=(d,n)=>{const x=new Date(d);x.setDate(x.getDate()+n);return x;};
+  const diasEntre=(a,b)=>Math.round((b-a)/86400000);
+  const SEM=['dom','seg','ter','qua','qui','sex','sáb'];
+  const ddmm=d=>`${pad2(d.getDate())}/${pad2(d.getMonth()+1)}`;
+  const semDdmm=d=>`${SEM[d.getDay()]} ${ddmm(d)}`;
+
   // --- ciclo do cartão ---
-  // dias de hoje até o próximo "dia que vira" (se o mês não tiver esse dia, usa o último dia do mês)
-  function diasAte(vira){
-    const hoje=new Date();hoje.setHours(0,0,0,0);
-    const alvo=(ano,mes)=>new Date(ano,mes,Math.min(vira,new Date(ano,mes+1,0).getDate()));
-    let t=alvo(hoje.getFullYear(),hoje.getMonth());
-    if(t<=hoje)t=alvo(hoje.getFullYear(),hoje.getMonth()+1);
-    return Math.round((t-hoje)/86400000);
+  // data do "dia que vira" num mês (se o mês não tiver esse dia, usa o último dia do mês)
+  const viradaNoMes=(ano,mes,vira)=>new Date(ano,mes,Math.min(vira,new Date(ano,mes+1,0).getDate()));
+  // próxima virada DEPOIS de uma data
+  function proxVirada(de,vira){
+    let t=viradaNoMes(de.getFullYear(),de.getMonth(),vira);
+    if(t<=de)t=viradaNoMes(de.getFullYear(),de.getMonth()+1,vira);
+    return t;
   }
+  // última virada ATÉ uma data (início de um ciclo cheio)
+  function ultVirada(ate,vira){
+    let t=viradaNoMes(ate.getFullYear(),ate.getMonth(),vira);
+    if(t>ate)t=viradaNoMes(ate.getFullYear(),ate.getMonth()-1,vira);
+    return t;
+  }
+  // o ciclo vai do início até a véspera da virada
+  const diasCiclo=(inicio,vira)=>diasEntre(inicio,proxVirada(inicio,vira));
   // dia válido entre 1 e 31, ou 0 se vazio/inválido
   const lerVira=v=>{const n=Math.round(v);return n>=1&&n<=31?n:0;};
 
   // começa vazio: nada é preenchido até o usuário configurar
-  const fresh=()=>({salario:0,divida:0,sobra:0,entries:[],configured:false,vira:null,dias:null});
-  // dados antigos (já configurados, sem ciclo) continuam valendo como ciclo cheio de 30 dias
+  const fresh=()=>({salario:0,divida:0,sobra:0,caixinhas:[],entries:[],configured:false,vira:null,inicio:null,dias:null});
+  // dados antigos: sem dia da virada → 30; sem data de início → o próximo dia a registrar vira "hoje"
   function normalize(s){
+    // caixinhas: o antigo "quanto quer que sobre" vira uma caixinha "Guardar"
+    if(!Array.isArray(s.caixinhas))
+      s.caixinhas=s.sobra>0?[{nome:'Guardar',valor:s.sobra,feito:false}]:[];
+    s.sobra=s.caixinhas.reduce((t,c)=>t+(+c.valor||0),0);
     if(s.configured){
       if(typeof s.vira!=='number')s.vira=30;
-      if(typeof s.dias!=='number'||s.dias<1)s.dias=CICLO_CHEIO;
+      if(!deIso(s.inicio))s.inicio=iso(addDias(hoje0(),-s.entries.length));
+      s.dias=diasCiclo(deIso(s.inicio),s.vira);
     }
     return s;
   }
@@ -233,26 +263,18 @@
   function save(){ store.set(KEY,JSON.stringify(state)); }
 
   const DIAS=()=>state.dias;
-  const variavel=()=>Math.max(0,state.salario-state.divida-state.sobra);
+  const inicio=()=>deIso(state.inicio);
+  const dataDoDia=i=>addDias(inicio(),i);       // i = 0 é o primeiro dia do ciclo
+  const cicloFechado=()=>state.entries.length>=DIAS();
+  const totalCx=()=>state.caixinhas.reduce((t,c)=>t+c.valor,0);
+  const variavel=()=>Math.max(0,state.salario-state.divida-totalCx());
   const teto=()=>variavel()/DIAS();
   const gastoTotal=()=>state.entries.reduce((s,e)=>s+e.spent,0);
   const diasReg=()=>state.entries.length;
   const acumulado=()=>teto()*diasReg()-gastoTotal();
   const disponivel=()=>teto()+acumulado();
-  const sobraProj=()=>state.sobra+acumulado();
-
-  // --- camada 50/30/20 ---
-  const IDEAL={fix:.50,var:.30,save:.20};
-  const pctFix=()=>state.salario?state.divida/state.salario:0;
-  const pctVar=()=>state.salario?variavel()/state.salario:0;
-  const pctSave=()=>state.salario?state.sobra/state.salario:0;
-  // folga nas fixas: quanto das "necessidades" (50%) sobrou e virou dia a dia
-  const folgaFix=()=>Math.max(0,IDEAL.fix*state.salario-state.divida);
-  function status(pct,ideal,invert){
-    // invert=true (guardar): mais é melhor. senão: menos é melhor.
-    if(invert){ if(pct>=ideal)return'ok'; if(pct>=ideal*.6)return'warn'; return'bad'; }
-    if(pct<=ideal)return'ok'; if(pct<=ideal*1.2)return'warn'; return'bad';
-  }
+  const sobraProj=()=>totalCx()+acumulado();
+  const esc=t=>String(t).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 
   // aceita "28,50" ou "28.50" e ignora lixo (R$, espaços). Se tiver os dois, ponto=milhar.
   function parseNum(raw){
@@ -282,14 +304,19 @@
       openSheet();
       return;
     }
-    const disp=disponivel(),ac=acumulado(),neg=disp<0,dia=diasReg();
-    const N=DIAS(),prog=Math.min(100,(dia/N)*100);
+    const ac=acumulado(),dia=diasReg(),N=DIAS(),fechado=cicloFechado();
+    const disp=fechado?ac:disponivel(),neg=disp<0;
+    const prog=Math.min(100,(dia/N)*100);
+    const prox=dataDoDia(dia),fim=dataDoDia(N-1),virada=dataDoDia(N);
+    const delta=diasEntre(hoje0(),prox);   // <0 atrasado, >0 adiantado
+    const quando=delta===0?'hoje':delta===-1?'ontem':delta===1?'amanhã':'';
+    const aviso=fechado?'':delta<0?'<span class="when late">pendente</span>':delta>0?'<span class="when ahead">ainda não chegou</span>':'';
     root.innerHTML=`
       <div class="wrap">
         <div class="head">
           <div>
             <div class="brand">ORÇA<b>MENTO</b></div>
-            <div class="sub">DIA ${String(Math.min(dia+1,N)).padStart(2,'0')} / ${String(N).padStart(2,'0')} · VIRA DIA ${state.vira}</div>
+            <div class="sub">${ddmm(inicio())} → ${ddmm(fim)} · VIRA ${ddmm(virada)}</div>
           </div>
           <button class="gear" id="gear" aria-label="Ajustes">⚙</button>
         </div>
@@ -298,24 +325,29 @@
 
         <div class="hero ${neg?'neg':''}">
           <div class="scan"></div>
-          <div class="label">Disponível hoje</div>
+          <div class="label">${fechado?'Saldo final do ciclo':`Disponível · ${semDdmm(prox)}`}</div>
           <div class="big"><span class="cur">R$</span>${brl(Math.abs(disp))}${neg?'<span class="tag">no vermelho</span>':''}</div>
-          <div class="breakdown">
-            <b>R$ ${brl(teto())}</b> do teto do dia
+          <div class="breakdown">${fechado
+            ?`Ciclo de ${ddmm(inicio())} a ${ddmm(fim)} fechado. ${ac>=0?'Esse valor fica de sobra.':'Esse valor passou do teto.'}`
+            :`<b>R$ ${brl(teto())}</b> do teto do dia
             ${ac>=0?` + <b>R$ ${brl(ac)}</b> que sobrou dos dias anteriores`
-                  :` − <b>R$ ${brl(-ac)}</b> que passou do teto`}
+                  :` − <b>R$ ${brl(-ac)}</b> que passou do teto`}`}
           </div>
-          ${dia>0?`<span class="pill ${ac>=0?'up':'down'}">${ac>=0?'▲ adiantado · ':'▼ estourado · '}R$ ${brl(Math.abs(ac))}</span>`:''}
+          ${dia>0&&!fechado?`<span class="pill ${ac>=0?'up':'down'}">${ac>=0?'▲ adiantado · ':'▼ estourado · '}R$ ${brl(Math.abs(ac))}</span>`:''}
         </div>
 
-        <div class="log">
-          <div class="q">Quanto gastei hoje?</div>
+        <div class="log">${fechado?`
+          <div class="q">Ciclo fechado</div>
+          <div class="hint" style="margin-bottom:12px">Todos os dias de ${ddmm(inicio())} a ${ddmm(fim)} foram registrados. O próximo ciclo começa em ${semDdmm(virada)}.</div>
+          <button class="btn btn-go" id="newCycleBtn" style="width:100%;padding:13px">Começar novo ciclo · ${ddmm(virada)}</button>`
+          :`
+          <div class="q">Quanto gastei ${quando?quando+', ':'em '}${semDdmm(prox)}? ${aviso}</div>
           <div class="inrow">
             <div class="infield"><span class="pre">R$</span>
               <input id="spend" class="mono" type="text" inputmode="decimal" autocomplete="off" placeholder="0,00"></div>
             <button class="btn btn-go" id="logBtn">Registrar</button>
           </div>
-          <button class="btn btn-zero" id="zeroBtn">Não gastei nada → rola pra amanhã</button>
+          <button class="btn btn-zero" id="zeroBtn">Não gastei nada em ${ddmm(prox)} → ${dia+1<N?'rola pra '+ddmm(dataDoDia(dia+1)):'fica de sobra'}</button>`}
         </div>
 
         <div class="grid">
@@ -323,12 +355,12 @@
             <div class="v ${ac>=0?'green':'coral'}">R$ ${brl0(ac)}</div>
             <div class="sub">${ac>=0?'sobrando do teto':'acima do teto'}</div></div>
           <div class="stat"><div class="k">Sobra projetada</div>
-            <div class="v ${sobraProj()>=state.sobra?'green':'coral'}">R$ ${brl0(sobraProj())}</div>
-            <div class="sub">no próximo salário</div></div>
+            <div class="v ${sobraProj()>=totalCx()?'green':'coral'}">R$ ${brl0(sobraProj())}</div>
+            <div class="sub">caixinhas + sobra do teto</div></div>
         </div>
 
-        <div class="hist-h" style="margin-top:20px"><span>// Saúde do mês · 50/30/20</span></div>
-        <div class="health">${renderHealth()}</div>
+        <div class="hist-h" style="margin-top:20px"><span>// Caixinhas do mês</span></div>
+        <div class="cxbox">${renderCx()}</div>
 
         <div class="hist-h" style="margin-top:20px"><span>// Histórico</span>${dia>0?'<button id="undoBtn">Desfazer último</button>':''}</div>
         <div class="hist">${renderHist()}</div>
@@ -337,10 +369,15 @@
       </div>`;
 
     document.getElementById('gear').onclick=openSheet;
-    document.getElementById('logBtn').onclick=()=>logDay(false);
-    document.getElementById('zeroBtn').onclick=()=>logDay(true);
-    const sp=document.getElementById('spend');
-    sp.onkeydown=e=>{if(e.key==='Enter')logDay(false)};
+    document.querySelectorAll('.cx-ok').forEach(b=>b.onclick=()=>{
+      const c=state.caixinhas[+b.dataset.i];c.feito=!c.feito;save();render();});
+    if(fechado){
+      qs('newCycleBtn').onclick=novoCiclo;
+    }else{
+      qs('logBtn').onclick=()=>logDay(false);
+      qs('zeroBtn').onclick=()=>logDay(true);
+      qs('spend').onkeydown=e=>{if(e.key==='Enter')logDay(false)};
+    }
     if(dia>0)document.getElementById('undoBtn').onclick=undo;
   }
 
@@ -348,55 +385,44 @@
     if(!state.entries.length)
       return '<div class="empty">Nenhum dia registrado.<br>Marque o gasto de hoje acima.</div>';
     let run=0;const t=teto();
-    return state.entries.map(e=>{
+    return state.entries.map((e,i)=>{
       run+=t-e.spent;const pos=run>=0;
-      return `<div class="row"><div class="d">DIA ${String(e.day).padStart(2,'0')}</div>
+      return `<div class="row"><div class="d">${semDdmm(dataDoDia(i)).toUpperCase()}</div>
         <div class="amt">${e.spent===0?'—':'R$ '+brl(e.spent)}</div>
         <div class="roll ${pos?'green':'coral'}">${pos?'+':'−'} R$ ${brl(Math.abs(run))}</div></div>`;
     }).reverse().join('');
   }
 
-  function bar(label,val,pct,ideal,invert){
-    const st=status(pct,ideal,invert);
-    const fill=Math.min(100,pct*100);
-    const mark=ideal*100;
-    return `<div class="hb">
-      <div class="hb-top">
-        <span class="hb-label">${label}</span>
-        <span class="hb-pct ${st}">${Math.round(pct*100)}% <small>/ ${Math.round(ideal*100)}%</small></span>
-      </div>
-      <div class="hb-track">
-        <i class="fill ${st}" style="width:${fill}%"></i>
-        <span class="ideal" style="left:${mark}%"></span>
-      </div>
-      <div class="hb-val">R$ ${brl0(val)}</div>
-    </div>`;
-  }
-  function renderHealth(){
-    if(!state.salario) return '';
-    const folga=folgaFix();
-    let msg='';
-    if(state.divida<=IDEAL.fix*state.salario){
-      msg=`<div class="hmsg ok">✓ Fixas enxutas — R$ ${brl0(folga)} abaixo do teto de necessidades. Essa folga virou dia a dia, e seu guardado (R$ ${brl0(state.sobra)}) segue intacto.</div>`;
-    }else{
-      const excesso=state.divida-IDEAL.fix*state.salario;
-      msg=`<div class="hmsg bad">⚠ Fixas R$ ${brl0(excesso)} acima do ideal (${Math.round(pctFix()*100)}%). Aperte aqui ou no dia a dia pra proteger o guardado.</div>`;
-    }
-    if(pctSave()<IDEAL.save)
-      msg+=`<div class="hmsg warn">Guardando ${Math.round(pctSave()*100)}% (ideal 20%). Enquanto sai do cartão, tudo bem — esse valor está matando o ciclo, não investindo ainda.</div>`;
-    return `
-      ${bar('Fixas · necessidades',state.divida,pctFix(),IDEAL.fix,false)}
-      ${bar('Dia a dia · desejos',variavel(),pctVar(),IDEAL.var,false)}
-      ${bar('Guardar · investir',state.sobra,pctSave(),IDEAL.save,true)}
-      ${msg}`;
+  function renderCx(){
+    if(!state.caixinhas.length)
+      return '<div class="empty">Nenhuma caixinha ainda.<br>Crie as suas (investir, viagens…) no ⚙.</div>';
+    const feito=state.caixinhas.filter(c=>c.feito).reduce((t,c)=>t+c.valor,0);
+    return state.caixinhas.map((c,i)=>`
+      <div class="cxrow ${c.feito?'done':''}">
+        <div class="n">${esc(c.nome)}</div>
+        <div class="val">R$ ${brl(c.valor)}</div>
+        <button class="cx-ok ${c.feito?'on':''}" data-i="${i}">${c.feito?'✓ Guardado':'Guardar'}</button>
+      </div>`).join('')+`
+      <div class="cxtot"><span>Guardado ${brl0(feito)} de ${brl0(totalCx())}</span><b>${feito>=totalCx()?'✓ tudo':'R$ '+brl0(totalCx()-feito)+' falta'}</b></div>`;
   }
 
   function logDay(zero){
     const inp=document.getElementById('spend');
     let v=zero?0:parseNum(inp.value);
     if(!zero&&(isNaN(v)||v<0)){inp.focus();return;}
-    state.entries.push({day:state.entries.length+1,spent:v});
+    if(cicloFechado())return;
+    const i=state.entries.length;
+    state.entries.push({day:i+1,date:iso(dataDoDia(i)),spent:v});
     save();render();
+  }
+  // novo ciclo: mantém salário/dívida/caixinhas, limpa os dias e começa na data da virada
+  function novoCiclo(){
+    state.inicio=iso(dataDoDia(DIAS()));
+    state.entries=[];
+    state.caixinhas.forEach(c=>c.feito=false);
+    state.dias=diasCiclo(inicio(),state.vira);
+    save();render();
+    openSheet();   // confere os valores do novo mês
   }
   function undo(){state.entries.pop();save();render();}
 
@@ -408,24 +434,24 @@
     div.innerHTML=`
       <div class="sheet" id="sheet">
         <h2>${first?'Configurar':'// Ajustes'}</h2>
-        <div class="hint">Teto diário = (salário − dívida fixa − o que quer que sobre) ÷ dias do ciclo.</div>
+        <div class="hint">Teto diário = (salário − dívida fixa − caixinhas) ÷ dias do ciclo. O ciclo vai da data de início até a véspera do dia que o cartão vira.</div>
         <div class="field"><label>Salário líquido</label>
           <div class="ctrl"><span class="pre">R$</span><input id="cf-sal" class="mono" type="text" inputmode="decimal" autocomplete="off" placeholder="0,00" value="${val(state.salario)}"></div></div>
         <div class="field"><label>Dívida fixa (vai pro cartão)</label>
           <div class="ctrl"><span class="pre">R$</span><input id="cf-div" class="mono" type="text" inputmode="decimal" autocomplete="off" placeholder="0,00" value="${val(state.divida)}"></div></div>
-        <div class="field"><label>Quanto quer que sobre</label>
-          <div class="ctrl"><span class="pre">R$</span><input id="cf-sob" class="mono" type="text" inputmode="decimal" autocomplete="off" placeholder="0,00" value="${val(state.sobra)}"></div>
-          <div class="quick"><span class="chip sug" id="sug20">◎ 20% do salário</span></div></div>
+        <div class="field"><label>Caixinhas (guardar todo mês)</label>
+          <div id="cxList"></div>
+          <button class="btn cx-add" id="cxAdd" type="button">+ Adicionar caixinha</button></div>
         <div class="field"><label>Ciclo do cartão</label>
           <div class="cyc">
             <div class="cyc-col"><span class="cyc-k">Vira no dia</span>
               <input id="cf-vira" class="mono" type="text" inputmode="numeric" autocomplete="off" placeholder="ex: 30" value="${val(state.vira)}"></div>
-            <div class="cyc-col"><span class="cyc-k">Dias neste ciclo</span>
-              <input id="cf-dias" class="mono" type="text" inputmode="numeric" autocomplete="off" placeholder="—" value="${val(state.dias)}"></div>
+            <div class="cyc-col"><span class="cyc-k">Começa em</span>
+              <input id="cf-ini" class="mono" type="date" value="${first?iso(hoje0()):(state.inicio||iso(hoje0()))}"></div>
           </div>
           <div class="quick">
-            <span class="chip" id="chAte"></span>
-            <span class="chip" id="chCheio">Ciclo cheio · ${CICLO_CHEIO} dias</span>
+            <span class="chip" id="chHoje">Começar hoje</span>
+            <span class="chip" id="chCheio"></span>
           </div>
           <div class="cyc-hint" id="cycHint"></div></div>
         <div class="teto-out"><span class="tl">Teto / dia</span>
@@ -450,23 +476,38 @@
     document.body.appendChild(div);
     div.onclick=e=>{if(e.target===div&&!first)close();};
 
-    const sal=qs('cf-sal'),dv=qs('cf-div'),sb=qs('cf-sob'),prev=qs('tetoPrev'),mix=qs('mix');
-    const vi=qs('cf-vira'),di=qs('cf-dias'),chAte=qs('chAte'),chCheio=qs('chCheio'),cycHint=qs('cycHint');
-    const lerDias=()=>{const n=Math.round(parseNum(di.value));return n>=1?n:0;};
+    const sal=qs('cf-sal'),dv=qs('cf-div'),prev=qs('tetoPrev'),mix=qs('mix'),cxList=qs('cxList');
+    // linhas editáveis das caixinhas (o "feito" do mês é preservado pela posição)
+    const cxRow=(c={nome:'',valor:''})=>{
+      const r=document.createElement('div');r.className='cx-edit';
+      r.innerHTML=`<input class="mono cx-nome" type="text" autocomplete="off" placeholder="Nome (ex: Viagens)" maxlength="24" value="${esc(c.nome)}">
+        <div class="ctrl"><span class="pre">R$</span><input class="mono cx-val" type="text" inputmode="decimal" autocomplete="off" placeholder="0,00" value="${c.valor===''?'':c.valor}"></div>
+        <button class="cx-del" type="button" aria-label="Remover">×</button>`;
+      r.querySelectorAll('input').forEach(el=>el.oninput=upd);
+      r.querySelector('.cx-del').onclick=()=>{r.remove();upd();};
+      cxList.appendChild(r);return r;
+    };
+    const lerCx=()=>[...cxList.querySelectorAll('.cx-edit')].map(r=>({
+      nome:r.querySelector('.cx-nome').value.trim(),valor:parseNum(r.querySelector('.cx-val').value)||0}))
+      .filter(c=>c.nome||c.valor>0);
+    const vi=qs('cf-vira'),ini=qs('cf-ini'),chHoje=qs('chHoje'),chCheio=qs('chCheio'),cycHint=qs('cycHint');
+    const lerIni=()=>deIso(ini.value);
+    const lerN=()=>{const v=lerVira(parseNum(vi.value)),d=lerIni();return v&&d?diasCiclo(d,v):0;};
     const upd=()=>{
-      const S=parseNum(sal.value)||0, D=parseNum(dv.value)||0, B=parseNum(sb.value)||0;
-      const V=Math.max(0,S-D-B), N=lerDias(), vira=lerVira(parseNum(vi.value)), ate=vira?diasAte(vira):0;
+      const S=parseNum(sal.value)||0, D=parseNum(dv.value)||0, B=lerCx().reduce((t,c)=>t+c.valor,0);
+      const V=Math.max(0,S-D-B), vira=lerVira(parseNum(vi.value)), d0=lerIni(), N=lerN();
       prev.textContent=N?(V/N).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2}):'—';
-      chAte.style.display=vira?'':'none';
-      chAte.textContent=`Hoje até dia ${vira} · ${ate} dias`;
-      chAte.classList.toggle('on',!!vira&&N===ate);
-      chCheio.classList.toggle('on',N===CICLO_CHEIO&&ate!==CICLO_CHEIO);
+      const hj=hoje0(), cheio=vira?ultVirada(hj,vira):null;
+      chHoje.classList.toggle('on',!!d0&&iso(d0)===iso(hj));
+      chCheio.style.display=vira?'':'none';
+      if(vira)chCheio.textContent=`Ciclo cheio · desde ${ddmm(cheio)}`;
+      chCheio.classList.toggle('on',!!vira&&!!d0&&iso(d0)===iso(cheio)&&iso(cheio)!==iso(hj));
       const dReg=diasReg();
       cycHint.textContent=!vira?'Informe o dia em que o cartão vira (1 a 31).'
-        :!N?'Informe quantos dias tem este ciclo.'
-        :dReg>N?`Você já registrou ${dReg} dias, mais do que os ${N} do ciclo.`
-        :`${V?'R$ '+brl(V):'R$ 0,00'} divididos em ${N} dias.`;
-      cycHint.classList.toggle('bad',(vi.value.trim()!==''&&!vira)||(vira&&!N)||(N&&dReg>N));
+        :!d0?'Escolha a data de início do ciclo.'
+        :`${ddmm(d0)} → ${ddmm(addDias(d0,N-1))} · ${N} ${N===1?'dia':'dias'} · vira ${ddmm(addDias(d0,N))}`
+          +(dReg>N?` — você já registrou ${dReg} dias`:'');
+      cycHint.classList.toggle('bad',(vi.value.trim()!==''&&!vira)||(vira&&!d0)||dReg>N&&!!N);
       if(S>0){
         const seg=(cls,val)=>`<i class="${cls}" style="width:${Math.min(100,val/S*100)}%"></i>`;
         const p=n=>Math.round(n/S*100);
@@ -475,27 +516,32 @@
           <div class="mixleg">
             <span><b class="df"></b>Fixas ${p(D)}%</span>
             <span><b class="dv"></b>Dia a dia ${p(V)}%</span>
-            <span><b class="ds"></b>Guardar ${p(B)}%</span>
+            <span><b class="ds"></b>Caixinhas ${p(B)}%</span>
           </div>
-          <div class="mixideal">Ideal: 50 / 30 / 20</div>`;
+          ${D+B>S?`<div class="mixwarn">Fixas + caixinhas passam do salário em R$ ${brl(D+B-S)}</div>`:''}`;
       } else mix.innerHTML='';
     };
-    [sal,dv,sb,di].forEach(el=>el.oninput=upd);
-    // mudar o dia que vira recalcula os dias a partir de hoje
-    vi.oninput=()=>{const v=lerVira(parseNum(vi.value));if(v)di.value=diasAte(v);upd();};
-    chAte.onclick=()=>{const v=lerVira(parseNum(vi.value));if(v){di.value=diasAte(v);upd();}};
-    chCheio.onclick=()=>{di.value=CICLO_CHEIO;upd();};
-    qs('sug20').onclick=()=>{const S=parseNum(sal.value)||0; if(S>0){sb.value=Math.round(S*.2); upd();}};
+    state.caixinhas.forEach(c=>cxRow(c));
+    qs('cxAdd').onclick=()=>{cxRow().querySelector('.cx-nome').focus();upd();};
+    [sal,dv,vi].forEach(el=>el.oninput=upd);
+    ini.onchange=upd;ini.oninput=upd;
+    chHoje.onclick=()=>{ini.value=iso(hoje0());upd();};
+    chCheio.onclick=()=>{const v=lerVira(parseNum(vi.value));if(v){ini.value=iso(ultVirada(hoje0(),v));upd();}};
     upd();
 
     qs('saveCfg').onclick=()=>{
-      const S=parseNum(sal.value),vira=lerVira(parseNum(vi.value)),N=lerDias(),err=qs('cfgErr');
+      const S=parseNum(sal.value),vira=lerVira(parseNum(vi.value)),d0=lerIni(),err=qs('cfgErr');
       const falta=!(S>0)?[sal,'Informe o salário líquido.']
         :!vira?[vi,'Informe o dia em que o cartão vira.']
-        :!N?[di,'Informe quantos dias tem este ciclo.']:null;
+        :!d0?[ini,'Escolha a data de início do ciclo.']:null;
+      const cx=lerCx(),semNome=[...cxList.querySelectorAll('.cx-nome')].find(el=>!el.value.trim()&&parseNum(el.closest('.cx-edit').querySelector('.cx-val').value)>0);
+      if(!falta&&semNome){err.textContent='Dê um nome para cada caixinha.';semNome.focus();return;}
       if(falta){err.textContent=falta[1];falta[0].focus();return;}
-      state.salario=S;state.divida=parseNum(dv.value)||0;state.sobra=parseNum(sb.value)||0;
-      state.vira=vira;state.dias=N;
+      // mantém o "guardado" de quem continua na mesma posição com o mesmo nome
+      state.caixinhas=cx.map((c,i)=>({nome:c.nome,valor:c.valor,
+        feito:!!(state.caixinhas[i]&&state.caixinhas[i].nome===c.nome&&state.caixinhas[i].feito)}));
+      state.salario=S;state.divida=parseNum(dv.value)||0;state.sobra=totalCx();
+      state.vira=vira;state.inicio=iso(d0);state.dias=diasCiclo(d0,vira);
       state.configured=true;save();close();render();
     };
     qs('impBtn').onclick=()=>qs('impFile').click();
